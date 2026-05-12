@@ -1,0 +1,41 @@
+{
+  "name": "agentisync",
+  "version": "0.1.0",
+  "description": "`agentisync` is a local control plane for agent skills in a repository.",
+  "type": "module",
+  "bin": {
+    "agentisync": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "prepack": "npm run build",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/daubas/agentisync.git"
+  },
+  "keywords": [],
+  "author": "daubas",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/daubas/agentisync/issues"
+  },
+  "homepage": "https://github.com/daubas/agentisync#readme",
+  "devDependencies": {
+    "@types/node": "^25.7.0",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.6"
+  },
+  "dependencies": {
+    "yaml": "^2.9.0"
+  }
+}

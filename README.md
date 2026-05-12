@@ -4,7 +4,7 @@
 
 It helps power users who switch between multiple agent CLIs keep one canonical skill tree, inspect drift, and project skills into the paths each tool expects.
 
-Status: planning/specification stage. Implementation has not started yet.
+Status: initial implementation. Core v1 commands are implemented with TDD coverage.
 
 ## Why
 
@@ -66,7 +66,7 @@ targets:
 
 ## Commands
 
-Planned v1 commands:
+Initial v1 commands:
 
 - `agentisync init`: create `.agentisync.yaml` and `.agents/skills`
 - `agentisync add <name>`: scaffold a canonical skill
@@ -133,7 +133,7 @@ Out of scope:
 
 它面向會在同一個專案中切換多個 agent CLI 的 power user，幫助使用者維護一份 canonical skill tree、檢查 drift，並把 skills 投影到各工具需要的路徑。
 
-目前狀態：規劃與規格階段，尚未開始實作。
+目前狀態：初版實作中。核心 v1 commands 已完成 TDD 覆蓋。
 
 ## 為什麼需要
 
@@ -220,4 +220,3 @@ Agent skills 雖然共用 `SKILL.md` 格式，但不同 agent CLI 仍然從不�
 - Cursor rules conversion
 - automatic commits
 - dependency graphs
-
