@@ -1,4 +1,4 @@
-import { lstat, mkdir, mkdtemp, readFile, realpath, writeFile } from "node:fs/promises";
+import { lstat, mkdir, mkdtemp, readFile, realpath, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
@@ -131,5 +131,29 @@ describe("createSyncPlan", () => {
     const plan = await createSyncPlan({ rootDir: root, homeDir: root, config });
 
     await expect(applySyncPlan(plan)).rejects.toThrow("sync plan has blocked actions");
+  });
+
+  it("blocks broken symlink target entries unless forced", async () => {
+    const root = await mkdtemp(path.join(tmpdir(), "agentisync-sync-"));
+    await writeSkill(root, ".agents/skills/build-docs", "canonical\n");
+    await mkdir(path.join(root, ".claude/skills"), { recursive: true });
+    await symlink(path.join(root, ".missing/build-docs"), path.join(root, ".claude/skills/build-docs"));
+    const config: AgentisyncConfig = {
+      version: 1,
+      canonical: ".agents/skills",
+      consumers: {},
+      targets: { claude: { path: ".claude/skills", mode: "symlink" } }
+    };
+
+    const plan = await createSyncPlan({ rootDir: root, homeDir: root, config });
+
+    expect(plan.actions).toHaveLength(0);
+    expect(plan.blocked).toEqual([
+      expect.objectContaining({
+        reason: "conflicting-target",
+        targetName: "claude",
+        skillName: "build-docs"
+      })
+    ]);
   });
 });

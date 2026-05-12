@@ -3,6 +3,7 @@ import { cwd } from "node:process";
 import { addSkill } from "./add.js";
 import { loadConfig } from "./config.js";
 import { AgentisyncError } from "./errors.js";
+import { formatStatus } from "./format.js";
 import { importSkills } from "./importer.js";
 import { initProject } from "./init.js";
 import { scanWorkspace } from "./scan.js";
@@ -37,7 +38,7 @@ async function main(): Promise<number> {
     if (process.argv.includes("--json")) {
       console.log(JSON.stringify(status, null, 2));
     } else {
-      console.log(`${status.summary.state}: ${status.canonical.skillCount} canonical skills`);
+      console.log(formatStatus(status));
     }
     return status.summary.state === "clean" ? 0 : 1;
   }

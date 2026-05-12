@@ -63,8 +63,18 @@ async function getTargets(options: StatusOptions, canonicalSkills: Awaited<Retur
     }
 
     const skills: StatusSkill[] = [];
+    const canonicalNames = new Set(canonicalSkills.map((skill) => skill.name));
     for (const skill of canonicalSkills) {
       skills.push(await inspectTargetSkill(targetRoot, skill));
+    }
+    for (const targetSkill of await discoverSkills(options.rootDir, targetRoot, "project")) {
+      if (!canonicalNames.has(targetSkill.name)) {
+        skills.push({
+          name: targetSkill.name,
+          state: "extra",
+          targetFingerprint: targetSkill.fingerprint
+        });
+      }
     }
 
     targets.push({
@@ -80,11 +90,11 @@ async function getTargets(options: StatusOptions, canonicalSkills: Awaited<Retur
 
 async function inspectTargetSkill(targetRoot: string, canonical: Awaited<ReturnType<typeof discoverSkills>>[number]): Promise<StatusSkill> {
   const targetPath = path.join(targetRoot, canonical.name);
-  if (!(await exists(targetPath))) {
+  const targetStat = await lstatIfPresent(targetPath);
+  if (!targetStat) {
     return { name: canonical.name, state: "missing", canonicalFingerprint: canonical.fingerprint };
   }
 
-  const targetStat = await lstat(targetPath);
   if (targetStat.isSymbolicLink()) {
     try {
       const targetRealPath = await realpath(targetPath);
@@ -106,11 +116,19 @@ async function inspectTargetSkill(targetRoot: string, canonical: Awaited<ReturnT
   };
 }
 
+async function lstatIfPresent(targetPath: string): Promise<Awaited<ReturnType<typeof lstat>> | null> {
+  try {
+    return await lstat(targetPath);
+  } catch {
+    return null;
+  }
+}
+
 function aggregateTargetState(mode: StatusTarget["mode"], skills: StatusSkill[]): StatusTarget["state"] {
   if (skills.some((skill) => skill.state === "missing")) {
     return "missing";
   }
-  if (skills.some((skill) => skill.state === "drifted" || skill.state === "broken")) {
+  if (skills.some((skill) => skill.state === "drifted" || skill.state === "broken" || skill.state === "extra")) {
     return "drifted";
   }
   return mode === "copy" ? "copied" : "symlinked";

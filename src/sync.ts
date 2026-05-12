@@ -1,4 +1,5 @@
 import { cp, mkdir, rm, symlink } from "node:fs/promises";
+import { lstat } from "node:fs/promises";
 import path from "node:path";
 import { UnsafeOperationError } from "./errors.js";
 import { fingerprintDirectory } from "./fingerprint.js";
@@ -22,7 +23,7 @@ export async function createSyncPlan(options: SyncPlanOptions): Promise<SyncPlan
     const targetRoot = resolveProjectPath(options.rootDir, target.path, options.homeDir);
     for (const skill of canonicalSkills) {
       const targetPath = path.join(targetRoot, skill.name);
-      if (!(await exists(targetPath))) {
+      if (!(await hasPathEntry(targetPath))) {
         plan.actions.push({
           kind: "create",
           targetName,
@@ -83,5 +84,18 @@ export async function applySyncPlan(plan: SyncPlan): Promise<void> {
 }
 
 async function targetMatchesCanonical(targetPath: string, skill: SkillSource): Promise<boolean> {
-  return (await fingerprintDirectory(targetPath)) === skill.fingerprint;
+  try {
+    return (await fingerprintDirectory(targetPath)) === skill.fingerprint;
+  } catch {
+    return false;
+  }
+}
+
+async function hasPathEntry(targetPath: string): Promise<boolean> {
+  try {
+    await lstat(targetPath);
+    return true;
+  } catch {
+    return false;
+  }
 }
