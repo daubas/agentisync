@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Documentation
+
+- Documented current project status after the `v0.1.0` source release.
+- Documented that GitHub Actions is configured but currently blocked by a GitHub account billing issue.
+- Clarified that local and Docker release checks are the current release verification path until hosted Actions are available.
+
 ## 0.1.0 - 2026-05-13
 
 Initial public release of `agentisync`.

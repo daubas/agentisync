@@ -6,7 +6,25 @@
 
 It helps power users who switch between multiple agent CLIs keep one canonical skill tree, inspect drift, and project skills into the paths each tool expects.
 
-Status: v0.1.0 release-ready. Core v1 commands are implemented with TDD coverage.
+Status: v0.1.0 source release. Core v1 commands are implemented with TDD coverage.
+
+## Project Status
+
+- Current release: `v0.1.0`
+- GitHub Release: <https://github.com/daubas/agentisync/releases/tag/v0.1.0>
+- npm package: not published yet
+- Local release gate: `npm run release:check`
+- Clean Linux release gate: Docker command in [Release Checks](#release-checks)
+- GitHub Actions: workflow is configured, but hosted Actions are currently blocked by a GitHub account billing issue
+
+Until GitHub Actions is unblocked, use the local or Docker release checks as the source of truth for release verification.
+
+Last verified locally on 2026-05-13:
+
+- `npm run release:check`
+- 10 test files passed
+- 30 tests passed
+- `npm pack --dry-run` passed
 
 ## Installation
 
@@ -285,7 +303,8 @@ Out of scope:
 - Windows symlink fallback behavior needs real-world validation.
 - Import conflict resolution is conservative and manual.
 - Status output is useful but still basic.
-- GitHub Actions CI is configured for Linux; macOS and Windows CI can be added later.
+- GitHub Actions CI is configured for Linux, but hosted Actions are currently blocked by a GitHub account billing issue.
+- macOS and Windows CI can be added after hosted Actions are available.
 
 ## Docs
 
@@ -305,7 +324,25 @@ Out of scope:
 
 它面向會在同一個專案中切換多個 agent CLI 的 power user，幫助使用者維護一份 canonical skill tree、檢查 drift，並把 skills 投影到各工具需要的路徑。
 
-目前狀態：v0.1.0 release-ready。核心 v1 commands 已完成 TDD 覆蓋。
+目前狀態：v0.1.0 source release。核心 v1 commands 已完成 TDD 覆蓋。
+
+## Project Status
+
+- 目前 release：`v0.1.0`
+- GitHub Release：<https://github.com/daubas/agentisync/releases/tag/v0.1.0>
+- npm package：尚未發布
+- 本機 release gate：`npm run release:check`
+- 乾淨 Linux release gate：見 [Release Checks](#release-checks)
+- GitHub Actions：workflow 已設定，但目前 hosted Actions 因 GitHub account billing issue 被阻擋
+
+在 GitHub Actions 恢復前，請以本機或 Docker release checks 作為 release verification 的依據。
+
+最後一次本機驗證時間：2026-05-13
+
+- `npm run release:check`
+- 10 test files passed
+- 30 tests passed
+- `npm pack --dry-run` passed
 
 ## 安裝方式
 
@@ -561,4 +598,5 @@ docker run --rm -v "$PWD":/app -w /app node:24-bookworm \
 - Windows symlink fallback 尚未經真實環境驗證。
 - Import conflict resolution 目前保守且需要手動處理。
 - Status output 可用但仍偏基礎。
-- GitHub Actions CI 已設定 Linux；macOS 和 Windows CI 可於後續補上。
+- GitHub Actions CI 已設定 Linux，但 hosted Actions 目前因 GitHub account billing issue 被阻擋。
+- macOS 和 Windows CI 可在 hosted Actions 可用後補上。
