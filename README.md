@@ -237,6 +237,25 @@ agentisync status --json
 
 In CI, any non-zero exit code should usually fail the job.
 
+## Release Checks
+
+Run the local release check before tagging or publishing:
+
+```bash
+npm run release:check
+```
+
+This runs typecheck, tests, build, and `npm pack --dry-run`.
+
+To verify in a clean Linux environment without depending on GitHub Actions:
+
+```bash
+docker run --rm -v "$PWD":/app -w /app node:24-bookworm \
+  sh -lc "npm ci && npm run release:check"
+```
+
+GitHub Actions runs the same release gate on push and pull request when Actions is available for the repository.
+
 ## V1 Scope
 
 In scope:
@@ -493,6 +512,25 @@ agentisync status --json
 ```
 
 在 CI 中，通常任何非 0 exit code 都應該讓 job 失敗。
+
+## Release Checks
+
+在 tag 或 publish 前執行本機 release check：
+
+```bash
+npm run release:check
+```
+
+這會執行 typecheck、tests、build 和 `npm pack --dry-run`。
+
+如果 GitHub Actions 暫時不能使用，可以用 Docker 在乾淨 Linux 環境驗證：
+
+```bash
+docker run --rm -v "$PWD":/app -w /app node:24-bookworm \
+  sh -lc "npm ci && npm run release:check"
+```
+
+當 repo 可使用 GitHub Actions 時，push 和 pull request 會跑同一組 release gate。
 
 ## V1 範圍
 

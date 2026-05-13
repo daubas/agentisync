@@ -15,7 +15,10 @@
   "main": "./dist/index.js",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
+    "check": "npm run typecheck && npm test && npm run build",
+    "pack:dry-run": "npm pack --dry-run",
     "prepack": "npm run build",
+    "release:check": "npm run check && npm run pack:dry-run",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

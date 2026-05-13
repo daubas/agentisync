@@ -21,6 +21,7 @@ Initial public release of `agentisync`.
 - Stable exit codes.
 - CLI `--help` and `--version`.
 - GitHub Actions CI with install, typecheck, test, build, and pack dry-run.
+- Local `release:check` and Docker release-check instructions for environments where GitHub Actions is unavailable.
 
 ### Not Included
 
