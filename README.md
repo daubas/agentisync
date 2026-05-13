@@ -6,6 +6,58 @@ It helps power users who switch between multiple agent CLIs keep one canonical s
 
 Status: initial implementation. Core v1 commands are implemented with TDD coverage.
 
+## Installation
+
+The package is not published to npm yet.
+
+For local development:
+
+```bash
+git clone https://github.com/daubas/agentisync.git
+cd agentisync
+npm install
+npm run build
+npm link
+```
+
+Then run:
+
+```bash
+agentisync status
+```
+
+Current CLI help is minimal. The command list below is the source of truth for now.
+
+## Quickstart
+
+Inside a project that should own shared agent skills:
+
+```bash
+agentisync init
+agentisync add build-docs
+agentisync status
+agentisync sync --dry-run
+agentisync sync
+agentisync status
+```
+
+This creates `.agentisync.yaml`, creates `.agents/skills`, scaffolds `.agents/skills/build-docs/SKILL.md`, reports drift, and projects canonical skills into configured targets.
+
+## Migrating Existing Skills
+
+For a repo that already has skills in `.claude/skills`, `.github/skills`, `.opencode/skills`, or global skill paths:
+
+```bash
+agentisync init
+agentisync scan
+agentisync import
+agentisync status
+```
+
+`scan` is read-only. It analyzes existing skills and reports duplicates or conflicts.
+
+`import` writes into `.agents/skills`, but stops before writing if unresolved conflicts exist.
+
 ## Why
 
 Agent skills use a shared `SKILL.md` format, but agent CLIs still discover them from different paths.
@@ -30,7 +82,20 @@ Without a repo-level control plane, users end up copying skills manually, creati
 
 It does not publish, search, install, or host skills.
 
-## Default Model
+## Core User Stories
+
+- Initialize one canonical skill tree in a repo.
+- Add a new skill once under `.agents/skills`.
+- Check whether repo skill state is clean before editing or syncing.
+- Use JSON status output and stable exit codes in CI.
+- Scan existing `.claude/skills`, `.github/skills`, `.opencode/skills`, and global paths before migration.
+- Import scattered skills into canonical without silent overwrite.
+- Sync canonical skills into tools that need projection.
+- Keep Codex and OpenClaw as direct consumers instead of projection targets.
+
+## Configuration
+
+Default model:
 
 - canonical root: `.agents/skills`
 - config file: `.agentisync.yaml`
@@ -64,6 +129,14 @@ targets:
     optional: true
 ```
 
+Config notes:
+
+- `consumers` are tools that read `.agents/skills` directly.
+- `targets` are paths that need projection.
+- `mode: symlink` is preferred for zero-drift projection.
+- `mode: copy` is useful for global or symlink-hostile targets.
+- `optional: true` means a missing target is reported as skipped rather than treated as a hard failure.
+
 ## Commands
 
 Initial v1 commands:
@@ -75,6 +148,14 @@ Initial v1 commands:
 - `agentisync sync`: project canonical skills into configured targets
 - `agentisync import`: normalize existing scattered skills into canonical
 
+Common options:
+
+- `agentisync status --json`
+- `agentisync scan --json`
+- `agentisync sync --dry-run`
+- `agentisync sync --force`
+- `agentisync import --json`
+
 Important safety behavior:
 
 - `status` is read-only
@@ -83,16 +164,23 @@ Important safety behavior:
 - `sync --force` may replace conflicting target entries, but never modifies canonical
 - `import` stops before writing when unresolved conflicts exist
 
-## Core User Stories
+## CI Usage
 
-- Initialize one canonical skill tree in a repo.
-- Add a new skill once under `.agents/skills`.
-- Check whether repo skill state is clean before editing or syncing.
-- Use JSON status output and stable exit codes in CI.
-- Scan existing `.claude/skills`, `.github/skills`, `.opencode/skills`, and global paths before migration.
-- Import scattered skills into canonical without silent overwrite.
-- Sync canonical skills into tools that need projection.
-- Keep Codex and OpenClaw as direct consumers instead of projection targets.
+`status` returns stable exit codes:
+
+- `0`: clean
+- `1`: drift, missing target content, extra content, conflict, or broken symlink
+- `2`: invalid config or command usage
+- `3`: unsafe operation blocked
+- `4`: filesystem or unexpected error
+
+Example:
+
+```bash
+agentisync status --json
+```
+
+In CI, any non-zero exit code should usually fail the job.
 
 ## V1 Scope
 
@@ -117,6 +205,15 @@ Out of scope:
 - automatic commits
 - dependency graphs
 
+## Current Limitations
+
+- npm package is not published yet.
+- CLI help/version output is still minimal.
+- Windows symlink fallback behavior needs real-world validation.
+- Import conflict resolution is conservative and manual.
+- Status output is useful but still basic.
+- No GitHub Actions CI workflow is configured yet.
+
 ## Docs
 
 - [PROBLEM.md](./PROBLEM.md)
@@ -134,6 +231,58 @@ Out of scope:
 它面向會在同一個專案中切換多個 agent CLI 的 power user，幫助使用者維護一份 canonical skill tree、檢查 drift，並把 skills 投影到各工具需要的路徑。
 
 目前狀態：初版實作中。核心 v1 commands 已完成 TDD 覆蓋。
+
+## 安裝方式
+
+目前尚未發布到 npm。
+
+本機開發使用：
+
+```bash
+git clone https://github.com/daubas/agentisync.git
+cd agentisync
+npm install
+npm run build
+npm link
+```
+
+然後執行：
+
+```bash
+agentisync status
+```
+
+目前 CLI help 還很簡單，請先以下方命令列表為準。
+
+## 快速開始
+
+在想要共用 agent skills 的專案內執行：
+
+```bash
+agentisync init
+agentisync add build-docs
+agentisync status
+agentisync sync --dry-run
+agentisync sync
+agentisync status
+```
+
+這會建立 `.agentisync.yaml`、建立 `.agents/skills`、建立 `.agents/skills/build-docs/SKILL.md`、回報 drift，並將 canonical skills 投影到設定好的 targets。
+
+## 遷移既有 Skills
+
+如果 repo 已經有 `.claude/skills`、`.github/skills`、`.opencode/skills` 或全域 skill paths：
+
+```bash
+agentisync init
+agentisync scan
+agentisync import
+agentisync status
+```
+
+`scan` 是唯讀，只分析既有 skills 並回報 duplicates 或 conflicts。
+
+`import` 會寫入 `.agents/skills`，但遇到 unresolved conflicts 時會停止，不會寫入。
 
 ## 為什麼需要
 
@@ -159,34 +308,6 @@ Agent skills 雖然共用 `SKILL.md` 格式，但不同 agent CLI 仍然從不�
 
 它不負責發布、搜尋、安裝或託管 skills。
 
-## 預設模型
-
-- canonical root：`.agents/skills`
-- config file：`.agentisync.yaml`
-- 直接讀 canonical 的工具是 `consumers`
-- 需要同步投影的路徑是 `targets`
-- `status` 是主要信任檢查
-- `scan` 只分析 import，不寫入
-- `import` 在完成 scan 等價分析後才寫入 canonical
-- `sync` 把 canonical skills 投影到設定好的 targets
-
-## 預計命令
-
-- `agentisync init`：建立 `.agentisync.yaml` 和 `.agents/skills`
-- `agentisync add <name>`：建立 canonical skill
-- `agentisync scan`：分析既有 skill trees，不寫入
-- `agentisync status`：回報 canonical、consumer、target 和 drift 狀態
-- `agentisync sync`：把 canonical skills 投影到 targets
-- `agentisync import`：把散落的 skills 收斂到 canonical
-
-安全行為：
-
-- `status` 不寫入
-- `scan` 不寫入
-- `sync --dry-run` 只顯示預計變更
-- `sync --force` 可以替換 target 衝突項目，但不能修改 canonical
-- `import` 遇到 unresolved conflicts 時會停止，不會寫入
-
 ## 核心 User Stories
 
 - 在 repo 內初始化一份 canonical skill tree。
@@ -197,6 +318,72 @@ Agent skills 雖然共用 `SKILL.md` 格式，但不同 agent CLI 仍然從不�
 - 將散落 skills 匯入 canonical，且不允許靜默覆蓋。
 - 將 canonical skills 同步到需要 projection 的工具。
 - 讓 Codex / OpenClaw 作為 direct consumers，而不是 projection targets。
+
+## 設定方式
+
+預設模型：
+
+- canonical root：`.agents/skills`
+- config file：`.agentisync.yaml`
+- 直接讀 canonical 的工具是 `consumers`
+- 需要同步投影的路徑是 `targets`
+- `status` 是主要信任檢查
+- `scan` 只分析 import，不寫入
+- `import` 在完成 scan 等價分析後才寫入 canonical
+- `sync` 把 canonical skills 投影到設定好的 targets
+
+設定說明：
+
+- `consumers` 是能直接讀 `.agents/skills` 的工具。
+- `targets` 是需要 projection 的路徑。
+- `mode: symlink` 適合零漂移 projection。
+- `mode: copy` 適合全域路徑或不適合 symlink 的 target。
+- `optional: true` 表示 target 不存在時回報 skipped，不視為硬錯誤。
+
+## 命令
+
+初版 v1 命令：
+
+- `agentisync init`：建立 `.agentisync.yaml` 和 `.agents/skills`
+- `agentisync add <name>`：建立 canonical skill
+- `agentisync scan`：分析既有 skill trees，不寫入
+- `agentisync status`：回報 canonical、consumer、target 和 drift 狀態
+- `agentisync sync`：把 canonical skills 投影到 targets
+- `agentisync import`：把散落的 skills 收斂到 canonical
+
+常用選項：
+
+- `agentisync status --json`
+- `agentisync scan --json`
+- `agentisync sync --dry-run`
+- `agentisync sync --force`
+- `agentisync import --json`
+
+安全行為：
+
+- `status` 不寫入
+- `scan` 不寫入
+- `sync --dry-run` 只顯示預計變更
+- `sync --force` 可以替換 target 衝突項目，但不能修改 canonical
+- `import` 遇到 unresolved conflicts 時會停止，不會寫入
+
+## CI 使用
+
+`status` 使用穩定 exit codes：
+
+- `0`：clean
+- `1`：drift、missing target content、extra content、conflict 或 broken symlink
+- `2`：invalid config 或 command usage
+- `3`：unsafe operation blocked
+- `4`：filesystem 或 unexpected error
+
+範例：
+
+```bash
+agentisync status --json
+```
+
+在 CI 中，通常任何非 0 exit code 都應該讓 job 失敗。
 
 ## V1 範圍
 
@@ -220,3 +407,12 @@ Agent skills 雖然共用 `SKILL.md` 格式，但不同 agent CLI 仍然從不�
 - Cursor rules conversion
 - automatic commits
 - dependency graphs
+
+## 目前限制
+
+- 尚未發布 npm package。
+- CLI help/version output 還很簡單。
+- Windows symlink fallback 尚未經真實環境驗證。
+- Import conflict resolution 目前保守且需要手動處理。
+- Status output 可用但仍偏基礎。
+- 尚未設定 GitHub Actions CI workflow。
