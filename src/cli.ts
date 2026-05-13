@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { createRequire } from "node:module";
 import { cwd } from "node:process";
 import { addSkill } from "./add.js";
 import { loadConfig } from "./config.js";
@@ -10,10 +11,40 @@ import { scanWorkspace } from "./scan.js";
 import { applySyncPlan, createSyncPlan } from "./sync.js";
 import { getStatus } from "./status.js";
 
+const require = createRequire(import.meta.url);
+const packageJson = require("../package.json") as { version: string };
+
+const HELP = `Usage: agentisync <command> [options]
+
+Commands:
+  agentisync init [--force]       Create .agentisync.yaml and .agents/skills
+  agentisync add <name>           Scaffold a canonical skill
+  agentisync scan [--json]        Analyze existing skills without writing
+  agentisync status [--json]      Report canonical, target, and drift state
+  agentisync sync --dry-run       Preview projection changes
+  agentisync sync                 Project canonical skills into targets
+  agentisync sync --force         Replace conflicting target entries
+  agentisync import [--json]      Import scattered skills into canonical
+
+Options:
+  --help, -h                      Show this help
+  --version, -v                   Show version
+`;
+
 async function main(): Promise<number> {
   const command = process.argv[2] ?? "status";
   const rootDir = cwd();
   const homeDir = process.env.HOME ?? rootDir;
+
+  if (command === "--help" || command === "-h" || command === "help") {
+    console.log(HELP);
+    return 0;
+  }
+
+  if (command === "--version" || command === "-v" || command === "version") {
+    console.log(packageJson.version);
+    return 0;
+  }
 
   if (command === "init") {
     await initProject({ rootDir, force: process.argv.includes("--force") });
@@ -107,6 +138,7 @@ async function main(): Promise<number> {
   }
 
   console.error(`Unsupported command: ${command}`);
+  console.error("Run `agentisync --help` for usage.");
   return 2;
 }
 

@@ -9,6 +9,7 @@
   "files": [
     "dist",
     "README.md",
+    "CHANGELOG.md",
     "LICENSE"
   ],
   "main": "./dist/index.js",
@@ -22,7 +23,16 @@
     "type": "git",
     "url": "git+https://github.com/daubas/agentisync.git"
   },
-  "keywords": [],
+  "keywords": [
+    "agent-skills",
+    "skills",
+    "ai-agents",
+    "codex",
+    "claude-code"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
   "author": "daubas",
   "license": "MIT",
   "bugs": {

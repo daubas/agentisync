@@ -1,10 +1,12 @@
 # agentisync
 
+[![CI](https://github.com/daubas/agentisync/actions/workflows/ci.yml/badge.svg)](https://github.com/daubas/agentisync/actions/workflows/ci.yml)
+
 `agentisync` is a local control plane for agent skills in a repository.
 
 It helps power users who switch between multiple agent CLIs keep one canonical skill tree, inspect drift, and project skills into the paths each tool expects.
 
-Status: initial implementation. Core v1 commands are implemented with TDD coverage.
+Status: v0.1.0 release-ready. Core v1 commands are implemented with TDD coverage.
 
 ## Installation
 
@@ -26,7 +28,12 @@ Then run:
 agentisync status
 ```
 
-Current CLI help is minimal. The command list below is the source of truth for now.
+Check CLI metadata:
+
+```bash
+agentisync --help
+agentisync --version
+```
 
 ## Quickstart
 
@@ -168,6 +175,42 @@ Common options:
 - `agentisync sync --force`
 - `agentisync import --json`
 
+### Command Examples
+
+Create a new project-local skill:
+
+```bash
+agentisync init
+agentisync add review-pr
+```
+
+Preview and apply projections:
+
+```bash
+agentisync status
+agentisync sync --dry-run
+agentisync sync
+```
+
+Inspect migration candidates before writing:
+
+```bash
+agentisync scan
+agentisync scan --json
+```
+
+Import existing skills into canonical:
+
+```bash
+agentisync import
+```
+
+Use status in automation:
+
+```bash
+agentisync status --json
+```
+
 Important safety behavior:
 
 - `status` is read-only
@@ -220,11 +263,10 @@ Out of scope:
 ## Current Limitations
 
 - npm package is not published yet.
-- CLI help/version output is still minimal.
 - Windows symlink fallback behavior needs real-world validation.
 - Import conflict resolution is conservative and manual.
 - Status output is useful but still basic.
-- No GitHub Actions CI workflow is configured yet.
+- GitHub Actions CI is configured for Linux; macOS and Windows CI can be added later.
 
 ## Docs
 
@@ -238,11 +280,13 @@ Out of scope:
 
 # agentisync 繁體中文說明
 
+[![CI](https://github.com/daubas/agentisync/actions/workflows/ci.yml/badge.svg)](https://github.com/daubas/agentisync/actions/workflows/ci.yml)
+
 `agentisync` 是 repo 內 agent skills 的本地控制層。
 
 它面向會在同一個專案中切換多個 agent CLI 的 power user，幫助使用者維護一份 canonical skill tree、檢查 drift，並把 skills 投影到各工具需要的路徑。
 
-目前狀態：初版實作中。核心 v1 commands 已完成 TDD 覆蓋。
+目前狀態：v0.1.0 release-ready。核心 v1 commands 已完成 TDD 覆蓋。
 
 ## 安裝方式
 
@@ -264,7 +308,12 @@ npm link
 agentisync status
 ```
 
-目前 CLI help 還很簡單，請先以下方命令列表為準。
+檢查 CLI metadata：
+
+```bash
+agentisync --help
+agentisync --version
+```
 
 ## 快速開始
 
@@ -383,6 +432,42 @@ Global skills 不會靜默覆蓋 project canonical skills。如果同名 skill �
 - `agentisync sync --force`
 - `agentisync import --json`
 
+### Command Examples
+
+建立新的 project-local skill：
+
+```bash
+agentisync init
+agentisync add review-pr
+```
+
+預覽並套用 projections：
+
+```bash
+agentisync status
+agentisync sync --dry-run
+agentisync sync
+```
+
+寫入前先檢查 migration candidates：
+
+```bash
+agentisync scan
+agentisync scan --json
+```
+
+把既有 skills 匯入 canonical：
+
+```bash
+agentisync import
+```
+
+在 automation 中使用 status：
+
+```bash
+agentisync status --json
+```
+
 安全行為：
 
 - `status` 不寫入
@@ -435,8 +520,7 @@ agentisync status --json
 ## 目前限制
 
 - 尚未發布 npm package。
-- CLI help/version output 還很簡單。
 - Windows symlink fallback 尚未經真實環境驗證。
 - Import conflict resolution 目前保守且需要手動處理。
 - Status output 可用但仍偏基礎。
-- 尚未設定 GitHub Actions CI workflow。
+- GitHub Actions CI 已設定 Linux；macOS 和 Windows CI 可於後續補上。

@@ -23,6 +23,24 @@ async function runCli(args: string[], cwd: string, reject = true): Promise<{ std
 }
 
 describe("cli", () => {
+  it("prints help without requiring a project config", async () => {
+    const root = await mkdtemp(path.join(tmpdir(), "agentisync-cli-"));
+
+    const result = await runCli(["--help"], root);
+
+    expect(result.stdout).toContain("Usage: agentisync <command>");
+    expect(result.stdout).toContain("agentisync init");
+    expect(result.stdout).toContain("agentisync sync --dry-run");
+  });
+
+  it("prints version without requiring a project config", async () => {
+    const root = await mkdtemp(path.join(tmpdir(), "agentisync-cli-"));
+
+    const result = await runCli(["--version"], root);
+
+    expect(result.stdout.trim()).toBe("0.1.0");
+  });
+
   it("runs init, add, status, and sync dry-run", async () => {
     const root = await mkdtemp(path.join(tmpdir(), "agentisync-cli-"));
 
