@@ -40,4 +40,20 @@ describe("scanWorkspace", () => {
     expect(result.conflicts).toHaveLength(1);
     expect(result.skills.get("build-docs")?.state).toBe("conflicting");
   });
+
+  it("scans the agentisync personal library as a personal import source", async () => {
+    const root = await mkdtemp(path.join(tmpdir(), "agentisync-scan-"));
+    await writeSkill(root, ".agentisync/skills/review-pr", "personal\n");
+
+    const result = await scanWorkspace({
+      rootDir: root,
+      homeDir: root,
+      canonical: ".agents/skills"
+    });
+
+    const skill = result.skills.get("review-pr");
+    expect(skill?.state).toBe("importable");
+    expect(skill?.sources[0]?.relativePath).toBe(".agentisync/skills/review-pr");
+    expect(skill?.sources[0]?.scope).toBe("personal");
+  });
 });

@@ -137,6 +137,18 @@ Config notes:
 - `mode: copy` is useful for global or symlink-hostile targets.
 - `optional: true` means a missing target is reported as skipped rather than treated as a hard failure.
 
+### Project vs Global Skills
+
+`agentisync` uses project-first precedence:
+
+1. `.agents/skills` is the project canonical source of truth.
+2. Project tool paths such as `.claude/skills` or `.opencode/skills` are migration sources or projection targets.
+3. User/global paths such as `~/.agentisync/skills`, `~/.agents/skills`, `~/.claude/skills`, or `~/.hermes/skills` are personal sources or optional targets.
+
+Global skills do not silently override project canonical skills. If the same skill name exists in project and global locations with different content, `scan` and `import` report a conflict instead of choosing one.
+
+Different agent CLIs may apply their own runtime precedence. `agentisync` uses project-first precedence for repo state because project skills are Git-friendly and reproducible.
+
 ## Commands
 
 Initial v1 commands:
@@ -339,6 +351,18 @@ Agent skills 雖然共用 `SKILL.md` 格式，但不同 agent CLI 仍然從不�
 - `mode: symlink` 適合零漂移 projection。
 - `mode: copy` 適合全域路徑或不適合 symlink 的 target。
 - `optional: true` 表示 target 不存在時回報 skipped，不視為硬錯誤。
+
+### Project vs Global Skills
+
+`agentisync` 採用 project-first precedence：
+
+1. `.agents/skills` 是 project canonical source of truth。
+2. `.claude/skills` 或 `.opencode/skills` 這類 project tool paths 是 migration sources 或 projection targets。
+3. `~/.agentisync/skills`、`~/.agents/skills`、`~/.claude/skills`、`~/.hermes/skills` 這類 user/global paths 是 personal sources 或 optional targets。
+
+Global skills 不會靜默覆蓋 project canonical skills。如果同名 skill 同時存在 project 和 global locations，且內容不同，`scan` 和 `import` 會回報 conflict，而不是自動選一個。
+
+不同 agent CLI 可能有自己的 runtime precedence。`agentisync` 對 repo state 採 project-first precedence，因為 project skills 比較 Git-friendly，也比較可重現。
 
 ## 命令
 

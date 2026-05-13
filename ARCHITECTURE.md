@@ -47,6 +47,8 @@ The project owns one canonical skills directory in the repo, by default:
 
 This directory is the source of truth for all synced targets.
 
+`agentisync` intentionally treats the project canonical directory as higher priority than personal or global skill locations. Global skills may be useful as a personal library, import source, or adapter target, but they are not allowed to override project canonical state.
+
 ### Targets
 
 A target is a path owned by a specific agent CLI, for example:
@@ -59,6 +61,8 @@ Targets are declared in config, not hardcoded in the binary.
 
 The canonical root itself is not a target. It is the source of truth that targets mirror from.
 
+Home-relative targets such as `~/.hermes/skills/` are treated as deployment destinations for tool compatibility, not as canonical sources.
+
 ### Skill identity
 
 A skill is identified by its directory name under the canonical root.
@@ -68,6 +72,24 @@ Example:
 - `.agents/skills/my-skill/SKILL.md`
 
 The sync layer should treat the directory as the unit of deployment.
+
+### Precedence model
+
+For analysis and migration, precedence is project-first:
+
+1. project canonical: `.agents/skills`
+2. project tool paths: `.claude/skills`, `.github/skills`, `.opencode/skills`
+3. user shared paths: `~/.agentisync/skills`, `~/.agents/skills`
+4. user tool paths: `~/.claude/skills`, `~/.copilot/skills`, `~/.hermes/skills`
+
+This follows the cross-client Agent Skills convention that project-level skills should override user-level skills for project state. Some clients may use different runtime precedence. For example, Claude Code documents personal skills as overriding project skills for same-name skills. `agentisync` should report and project filesystem state, not pretend every client resolves conflicts the same way.
+
+The practical rule is:
+
+- project canonical wins inside `agentisync`
+- global paths can be imported from or projected to
+- global paths do not silently change project truth
+- client-specific runtime precedence should be surfaced as adapter notes or warnings when relevant
 
 ## Config
 
@@ -304,6 +326,7 @@ Answer:
 - they should remain optional adapters
 - the core should still be project-local and predictable
 - if a tool cannot fit the model cleanly, it should not distort the architecture
+- global locations are useful compatibility surfaces, but not canonical state in v1
 
 ### Objection 5: Why not just use `.agents/skills` directly and stop there?
 

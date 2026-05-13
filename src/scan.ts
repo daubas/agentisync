@@ -4,7 +4,13 @@ import { discoverSkills, exists } from "./skills.js";
 import type { ScanResult, ScanSkill, SkillSource } from "./types.js";
 
 const PROJECT_SCAN_PATHS = [".github/skills", ".claude/skills", ".agents/skills", ".opencode/skills"];
-const HOME_SCAN_PATHS = ["~/.agents/skills", "~/.claude/skills", "~/.copilot/skills", "~/.hermes/skills"];
+const HOME_SCAN_PATHS = [
+  "~/.agentisync/skills",
+  "~/.agents/skills",
+  "~/.claude/skills",
+  "~/.copilot/skills",
+  "~/.hermes/skills"
+];
 
 export interface ScanWorkspaceOptions {
   rootDir: string;

@@ -73,6 +73,24 @@ targets:
 - home-relative paths beginning with `~/` are `personal`
 - skills written into canonical by `import` are `imported`
 
+### Discovery Precedence
+
+`agentisync` uses project-first precedence for canonical analysis:
+
+1. project canonical: `.agents/skills`
+2. project tool paths: `.claude/skills`, `.github/skills`, `.opencode/skills`
+3. user shared paths: `~/.agentisync/skills`, `~/.agents/skills`
+4. user tool paths: `~/.claude/skills`, `~/.copilot/skills`, `~/.hermes/skills`
+
+When the same skill name appears in multiple scopes:
+
+- configured canonical state wins for `status`, `sync`, and `import` decisions
+- matching fingerprints are duplicates and may be reported as additional sources
+- different fingerprints are conflicts and must not be silently overwritten
+- personal or global skills must never override project canonical state
+
+Different agent clients may apply their own runtime precedence. `agentisync` does not attempt to emulate every client at runtime; it uses project-first precedence to keep repo state Git-friendly and reproducible.
+
 ## State Model
 
 V1 state is computed from the filesystem and config. A persisted state file is not required.
@@ -194,6 +212,7 @@ Known v1 scan locations:
 - `.claude/skills`
 - `.agents/skills`
 - `.opencode/skills`
+- `~/.agentisync/skills`
 - `~/.agents/skills`
 - `~/.claude/skills`
 - `~/.copilot/skills`
@@ -201,6 +220,7 @@ Known v1 scan locations:
 
 If `.agentisync.yaml` exists, the configured canonical path is treated as canonical state, not as an import source.
 If config is missing, an existing `.agents/skills` directory may be treated as a bootstrap canonical candidate.
+Global paths are scan/import sources or optional projection targets only. They are not canonical state in v1.
 
 ## Status Semantics
 
