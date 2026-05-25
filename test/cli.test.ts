@@ -10,8 +10,15 @@ const TSX_LOADER = path.resolve("node_modules/tsx/dist/loader.mjs");
 const execFileAsync = promisify(execFile);
 
 async function runCli(args: string[], cwd: string, reject = true): Promise<{ stdout: string; stderr: string; exitCode: number }> {
+  const homeDir = path.join(cwd, "home");
   try {
-    const result = await execFileAsync(process.execPath, ["--import", TSX_LOADER, CLI, ...args], { cwd });
+    const result = await execFileAsync(process.execPath, ["--import", TSX_LOADER, CLI, ...args], {
+      cwd,
+      env: {
+        ...process.env,
+        HOME: homeDir
+      }
+    });
     return { stdout: result.stdout, stderr: result.stderr, exitCode: 0 };
   } catch (error) {
     const execError = error as Error & { stdout?: string; stderr?: string; code?: number };
