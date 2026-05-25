@@ -4,6 +4,7 @@ export { fingerprintDirectory } from "./fingerprint.js";
 export { formatStatus } from "./format.js";
 export { importSkills } from "./importer.js";
 export { initProject } from "./init.js";
+export { pullSkillFromLibrary, pushSkillToLibrary } from "./library.js";
 export { scanWorkspace } from "./scan.js";
 export { getStatus } from "./status.js";
 export { createSyncPlan } from "./sync.js";

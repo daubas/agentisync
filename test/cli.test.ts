@@ -29,6 +29,29 @@ async function runCli(args: string[], cwd: string, reject = true): Promise<{ std
   }
 }
 
+async function runGit(args: string[], cwd: string): Promise<void> {
+  await execFileAsync("git", args, { cwd });
+}
+
+async function seedLibraryRepo(content: string): Promise<string> {
+  const library = await mkdtemp(path.join(tmpdir(), "agentisync-library-"));
+  const workParent = await mkdtemp(path.join(tmpdir(), "agentisync-seed-"));
+  const work = path.join(workParent, "repo");
+
+  await runGit(["init", "--bare", library], workParent);
+  await runGit(["clone", library, work], workParent);
+  await runGit(["checkout", "-b", "main"], work);
+  await runGit(["config", "user.name", "agentisync"], work);
+  await runGit(["config", "user.email", "agentisync@local"], work);
+  await mkdir(path.join(work, ".agents/skills/build-docs"), { recursive: true });
+  await writeFile(path.join(work, ".agents/skills/build-docs/SKILL.md"), content);
+  await runGit(["add", "."], work);
+  await runGit(["commit", "-m", "seed skills library"], work);
+  await runGit(["push", "-u", "origin", "main"], work);
+
+  return library;
+}
+
 describe("cli", () => {
   it("prints help without requiring a project config", async () => {
     const root = await mkdtemp(path.join(tmpdir(), "agentisync-cli-"));
@@ -63,6 +86,16 @@ describe("cli", () => {
     expect(sync.stdout).toContain("create claude/build-docs");
   });
 
+  it("initializes a library-backed config from the cli", async () => {
+    const root = await mkdtemp(path.join(tmpdir(), "agentisync-cli-"));
+
+    await runCli(["init", "--library", "git@github-daubas:daubas/skills.git", "--branch", "main"], root);
+
+    await expect(readFile(path.join(root, ".agentisync.yaml"), "utf8")).resolves.toContain("library:");
+    await expect(readFile(path.join(root, ".agentisync.yaml"), "utf8")).resolves.toContain('url: "git@github-daubas:daubas/skills.git"');
+    await expect(readFile(path.join(root, ".agentisync.yaml"), "utf8")).resolves.toContain('branch: "main"');
+  });
+
   it("imports existing skills", async () => {
     const root = await mkdtemp(path.join(tmpdir(), "agentisync-cli-"));
     await mkdir(path.join(root, ".claude/skills/build-docs"), { recursive: true });
@@ -87,5 +120,53 @@ describe("cli", () => {
 
     expect(result.exitCode).toBe(3);
     expect(result.stderr).toContain("cannot import with unresolved conflicts");
+  });
+
+  it("pulls a single skill from a git library", async () => {
+    const root = await mkdtemp(path.join(tmpdir(), "agentisync-cli-"));
+    const library = await seedLibraryRepo("from library\n");
+
+    await runCli(["init"], root);
+    await writeFile(
+      path.join(root, ".agentisync.yaml"),
+      [
+        "version: 1",
+        "canonical: .agents/skills",
+        "library:",
+        `  url: ${library}`,
+        ""
+      ].join("\n")
+    );
+
+    const result = await runCli(["pull", "build-docs"], root);
+
+    expect(result.stdout).toContain("pulled build-docs");
+    await expect(readFile(path.join(root, ".agents/skills/build-docs/SKILL.md"), "utf8")).resolves.toBe("from library\n");
+  });
+
+  it("pushes a single skill back to the git library", async () => {
+    const root = await mkdtemp(path.join(tmpdir(), "agentisync-cli-"));
+    const library = await seedLibraryRepo("from library\n");
+
+    await runCli(["init"], root);
+    await writeFile(
+      path.join(root, ".agentisync.yaml"),
+      [
+        "version: 1",
+        "canonical: .agents/skills",
+        "library:",
+        `  url: ${library}`,
+        ""
+      ].join("\n")
+    );
+
+    await mkdir(path.join(root, ".agents/skills/build-docs"), { recursive: true });
+    await writeFile(path.join(root, ".agents/skills/build-docs/SKILL.md"), "updated locally\n");
+
+    const result = await runCli(["push", "build-docs"], root);
+
+    expect(result.stdout).toContain("pushed build-docs");
+    const remoteRead = await execFileAsync("git", ["--git-dir", library, "show", "main:.agents/skills/build-docs/SKILL.md"]);
+    expect(remoteRead.stdout).toBe("updated locally\n");
   });
 });

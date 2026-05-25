@@ -4,7 +4,7 @@
 
 `agentisync` is a local control plane for agent skills in a repository.
 
-It helps power users who switch between multiple agent CLIs keep one canonical skill tree, inspect drift, and project skills into the paths each tool expects.
+It gives you one canonical skill tree, optional sync targets for agent CLIs, and an optional Git-backed library for pulling or publishing single skills.
 
 Status: v0.1.0 source release. Core v1 commands are implemented with TDD coverage.
 
@@ -19,11 +19,11 @@ Status: v0.1.0 source release. Core v1 commands are implemented with TDD coverag
 
 Until GitHub Actions is unblocked, use the local or Docker release checks as the source of truth for release verification.
 
-Last verified locally on 2026-05-13:
+Last verified locally on 2026-05-25:
 
 - `npm run release:check`
 - 10 test files passed
-- 30 tests passed
+- 32 tests passed
 - `npm pack --dry-run` passed
 
 ## Installation
@@ -55,33 +55,40 @@ agentisync --version
 
 ## Quickstart
 
-Inside a project that should own shared agent skills:
+Inside the project that should own shared agent skills:
 
 ```bash
-agentisync init
-agentisync add build-docs
+agentisync init --library git@github-daubas:daubas/skills.git --branch main
+agentisync pull build-docs
+agentisync add review-pr
 agentisync status
 agentisync sync --dry-run
 agentisync sync
-agentisync status
 ```
 
-This creates `.agentisync.yaml`, creates `.agents/skills`, scaffolds `.agents/skills/build-docs/SKILL.md`, reports drift, and projects canonical skills into configured targets.
+That creates `.agentisync.yaml`, creates `.agents/skills`, connects the optional skills library, and keeps local targets in sync.
 
-## Migrating Existing Skills
+## Library Workflow
 
-For a repo that already has skills in `.claude/skills`, `.github/skills`, `.opencode/skills`, or global skill paths:
+Use `pull` and `push` to move one skill at a time between the local canonical tree and the central Git repo:
 
 ```bash
-agentisync init
-agentisync scan
-agentisync import
-agentisync status
+agentisync pull build-docs
+agentisync push build-docs
 ```
 
-`scan` is read-only. It analyzes existing skills and reports duplicates or conflicts.
+If you do not want a library yet, run `agentisync init` without `--library`.
 
-`import` writes into `.agents/skills`, but stops before writing if unresolved conflicts exist.
+## Advanced Migration
+
+If a repo already has skills in `.claude/skills`, `.github/skills`, `.opencode/skills`, or global skill paths, use:
+
+```bash
+agentisync scan
+agentisync import
+```
+
+`scan` is read-only. `import` writes into `.agents/skills` and stops if there are unresolved conflicts.
 
 ## Why
 
@@ -113,10 +120,9 @@ It does not publish, search, install, or host skills.
 - Add a new skill once under `.agents/skills`.
 - Check whether repo skill state is clean before editing or syncing.
 - Use JSON status output and stable exit codes in CI.
-- Scan existing `.claude/skills`, `.github/skills`, `.opencode/skills`, and global paths before migration.
-- Import scattered skills into canonical without silent overwrite.
 - Sync canonical skills into tools that need projection.
-- Keep Codex and OpenClaw as direct consumers instead of projection targets.
+- Pull one skill from a Git-backed library.
+- Push one skill back to that library.
 
 ## Configuration
 
@@ -130,6 +136,7 @@ Default model:
 - `scan` analyzes imports without writing
 - `import` writes into canonical only after scan-equivalent analysis
 - `sync` projects canonical skills into configured targets
+- `pull` and `push` move one skill at a time between canonical and a Git-backed library
 
 Example config:
 
@@ -184,6 +191,8 @@ Initial v1 commands:
 - `agentisync status`: report canonical, consumer, target, and drift state
 - `agentisync sync`: project canonical skills into configured targets
 - `agentisync import`: normalize existing scattered skills into canonical
+- `agentisync pull <name>`: copy one skill from a Git-backed library into canonical
+- `agentisync push <name>`: commit one canonical skill back to the Git-backed library
 
 Common options:
 
@@ -198,7 +207,6 @@ Common options:
 Create a new project-local skill:
 
 ```bash
-agentisync init
 agentisync add review-pr
 ```
 
@@ -208,19 +216,6 @@ Preview and apply projections:
 agentisync status
 agentisync sync --dry-run
 agentisync sync
-```
-
-Inspect migration candidates before writing:
-
-```bash
-agentisync scan
-agentisync scan --json
-```
-
-Import existing skills into canonical:
-
-```bash
-agentisync import
 ```
 
 Use status in automation:

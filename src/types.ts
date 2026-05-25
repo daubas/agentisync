@@ -10,11 +10,18 @@ export interface TargetConfig {
   optional?: boolean;
 }
 
+export interface LibraryConfig {
+  url: string;
+  branch?: string;
+  canonical?: string;
+}
+
 export interface AgentisyncConfig {
   version: 1;
   canonical: string;
   consumers: Record<string, ConsumerConfig>;
   targets: Record<string, TargetConfig>;
+  library?: LibraryConfig;
 }
 
 export type SkillState = "clean" | "missing" | "drifted" | "extra" | "broken" | "skipped" | "conflict";

@@ -3,13 +3,14 @@ import path from "node:path";
 import { parse } from "yaml";
 import { UsageError } from "./errors.js";
 import { normalizePath } from "./paths.js";
-import type { AgentisyncConfig, SyncMode } from "./types.js";
+import type { AgentisyncConfig, LibraryConfig, SyncMode } from "./types.js";
 
 interface RawConfig {
   version?: unknown;
   canonical?: unknown;
   consumers?: unknown;
   targets?: unknown;
+  library?: unknown;
 }
 
 export async function loadConfig(rootDir: string): Promise<AgentisyncConfig> {
@@ -28,6 +29,7 @@ export function parseConfig(raw: RawConfig): AgentisyncConfig {
 
   const consumers = parseConsumers(raw.consumers);
   const targets = parseTargets(raw.targets);
+  const library = parseLibrary(raw.library);
   const canonical = normalizePath(raw.canonical);
 
   for (const target of Object.values(targets)) {
@@ -40,7 +42,8 @@ export function parseConfig(raw: RawConfig): AgentisyncConfig {
     version: 1,
     canonical,
     consumers,
-    targets
+    targets,
+    library
   };
 }
 
@@ -85,6 +88,20 @@ function parseTargets(value: unknown): AgentisyncConfig["targets"] {
     };
   }
   return targets;
+}
+
+function parseLibrary(value: unknown): LibraryConfig | undefined {
+  if (value == null) {
+    return undefined;
+  }
+  if (!isRecord(value) || typeof value.url !== "string" || value.url.length === 0) {
+    throw new UsageError("library must define url");
+  }
+  return {
+    url: value.url,
+    branch: typeof value.branch === "string" && value.branch.length > 0 ? value.branch : undefined,
+    canonical: typeof value.canonical === "string" && value.canonical.length > 0 ? normalizePath(value.canonical) : undefined
+  };
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

@@ -12,6 +12,8 @@ describe("loadConfig", () => {
       [
         "version: 1",
         "canonical: .agents/skills",
+        "library:",
+        "  url: git@github-daubas:daubas/skills.git",
         "consumers:",
         "  codex:",
         "    path: .agents/skills",
@@ -28,6 +30,7 @@ describe("loadConfig", () => {
     expect(config.canonical).toBe(".agents/skills");
     expect(config.consumers.codex.path).toBe(".agents/skills");
     expect(config.targets.claude.mode).toBe("symlink");
+    expect(config.library?.url).toBe("git@github-daubas:daubas/skills.git");
   });
 
   it("rejects canonical when it is also configured as a target", async () => {

@@ -21,4 +21,20 @@ describe("initProject", () => {
     await expect(initProject({ rootDir: root })).rejects.toThrow("config already exists");
     await expect(readFile(path.join(root, ".agentisync.yaml"), "utf8")).resolves.toContain("canonical: custom");
   });
+
+  it("writes library settings when provided", async () => {
+    const root = await mkdtemp(path.join(tmpdir(), "agentisync-init-"));
+
+    await initProject({
+      rootDir: root,
+      library: {
+        url: "git@github-daubas:daubas/skills.git",
+        branch: "main"
+      }
+    });
+
+    await expect(readFile(path.join(root, ".agentisync.yaml"), "utf8")).resolves.toContain("library:");
+    await expect(readFile(path.join(root, ".agentisync.yaml"), "utf8")).resolves.toContain('url: "git@github-daubas:daubas/skills.git"');
+    await expect(readFile(path.join(root, ".agentisync.yaml"), "utf8")).resolves.toContain('branch: "main"');
+  });
 });

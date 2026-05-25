@@ -7,6 +7,7 @@ import { AgentisyncError } from "./errors.js";
 import { formatStatus } from "./format.js";
 import { importSkills } from "./importer.js";
 import { initProject } from "./init.js";
+import { pullSkillFromLibrary, pushSkillToLibrary } from "./library.js";
 import { scanWorkspace } from "./scan.js";
 import { applySyncPlan, createSyncPlan } from "./sync.js";
 import { getStatus } from "./status.js";
@@ -17,13 +18,18 @@ const packageJson = require("../package.json") as { version: string };
 const HELP = `Usage: agentisync <command> [options]
 
 Commands:
-  agentisync init [--force]       Create .agentisync.yaml and .agents/skills
+  agentisync init [--force] [--library <url>] [--branch <name>]
+                                   Create .agentisync.yaml and .agents/skills
   agentisync add <name>           Scaffold a canonical skill
-  agentisync scan [--json]        Analyze existing skills without writing
   agentisync status [--json]      Report canonical, target, and drift state
   agentisync sync --dry-run       Preview projection changes
   agentisync sync                 Project canonical skills into targets
   agentisync sync --force         Replace conflicting target entries
+  agentisync pull <name>          Pull one skill from a configured library
+  agentisync push <name>          Publish one skill to the configured library
+
+Advanced:
+  agentisync scan [--json]        Analyze existing skills without writing
   agentisync import [--json]      Import scattered skills into canonical
 
 Options:
@@ -47,7 +53,12 @@ async function main(): Promise<number> {
   }
 
   if (command === "init") {
-    await initProject({ rootDir, force: process.argv.includes("--force") });
+    const initArgs = process.argv.slice(3);
+    await initProject({
+      rootDir,
+      force: initArgs.includes("--force"),
+      library: parseInitLibrary(initArgs)
+    });
     console.log("initialized agentisync");
     return 0;
   }
@@ -108,6 +119,39 @@ async function main(): Promise<number> {
     return 0;
   }
 
+  if (command === "pull") {
+    const name = process.argv[3];
+    if (!name) {
+      throw new AgentisyncError("usage: agentisync pull <name>", 2);
+    }
+    const config = await loadConfig(rootDir);
+    await pullSkillFromLibrary({
+      rootDir,
+      homeDir,
+      config,
+      name,
+      force: process.argv.includes("--force")
+    });
+    console.log(`pulled ${name}`);
+    return 0;
+  }
+
+  if (command === "push") {
+    const name = process.argv[3];
+    if (!name) {
+      throw new AgentisyncError("usage: agentisync push <name>", 2);
+    }
+    const config = await loadConfig(rootDir);
+    await pushSkillToLibrary({
+      rootDir,
+      homeDir,
+      config,
+      name
+    });
+    console.log(`pushed ${name}`);
+    return 0;
+  }
+
   if (command === "sync") {
     const config = await loadConfig(rootDir);
     const plan = await createSyncPlan({
@@ -140,6 +184,27 @@ async function main(): Promise<number> {
   console.error(`Unsupported command: ${command}`);
   console.error("Run `agentisync --help` for usage.");
   return 2;
+}
+
+function parseInitLibrary(args: string[]): { url: string; branch?: string } | undefined {
+  const url = getFlagValue(args, "--library");
+  if (!url) {
+    return undefined;
+  }
+  const branch = getFlagValue(args, "--branch");
+  return branch ? { url, branch } : { url };
+}
+
+function getFlagValue(args: string[], flag: string): string | undefined {
+  const index = args.indexOf(flag);
+  if (index >= 0 && index < args.length - 1) {
+    const value = args[index + 1];
+    if (!value.startsWith("--")) {
+      return value;
+    }
+  }
+  const match = args.find((arg) => arg.startsWith(`${flag}=`));
+  return match ? match.slice(flag.length + 1) : undefined;
 }
 
 main()
