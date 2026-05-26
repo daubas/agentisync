@@ -45,14 +45,14 @@ npm link
 Then run:
 
 ```bash
-oh-my-skill-hub status
+myskillhub status
 ```
 
 Check CLI metadata:
 
 ```bash
-oh-my-skill-hub --help
-oh-my-skill-hub --version
+myskillhub --help
+myskillhub --version
 ```
 
 ## Quickstart
@@ -60,12 +60,12 @@ oh-my-skill-hub --version
 Inside the project that should own shared agent skills:
 
 ```bash
-oh-my-skill-hub init --library git@github-daubas:daubas/skills.git --branch main
-oh-my-skill-hub pull build-docs
-oh-my-skill-hub add review-pr
-oh-my-skill-hub status
-oh-my-skill-hub sync --dry-run
-oh-my-skill-hub sync
+myskillhub init --library git@github-daubas:daubas/skills.git --branch main
+myskillhub pull build-docs
+myskillhub add review-pr
+myskillhub status
+myskillhub sync --dry-run
+myskillhub sync
 ```
 
 That creates `.agentisync.yaml`, creates `.agents/skills`, connects the optional skills library, and keeps local targets in sync.
@@ -75,19 +75,19 @@ That creates `.agentisync.yaml`, creates `.agents/skills`, connects the optional
 Use `pull` and `push` to move one skill at a time between the local canonical tree and the central Git repo:
 
 ```bash
-oh-my-skill-hub pull build-docs
-oh-my-skill-hub push build-docs
+myskillhub pull build-docs
+myskillhub push build-docs
 ```
 
-If you do not want a library yet, run `oh-my-skill-hub init` without `--library`.
+If you do not want a library yet, run `myskillhub init` without `--library`.
 
 ## Advanced Migration
 
 If a repo already has skills in `.claude/skills`, `.github/skills`, `.opencode/skills`, or global skill paths, use:
 
 ```bash
-oh-my-skill-hub scan
-oh-my-skill-hub import
+myskillhub scan
+myskillhub import
 ```
 
 `scan` is read-only. `import` writes into `.agents/skills` and stops if there are unresolved conflicts.
@@ -187,43 +187,43 @@ Different agent CLIs may apply their own runtime precedence. `oh-my-skill-hub` u
 
 Initial v1 commands:
 
-- `oh-my-skill-hub init`: create `.agentisync.yaml` and `.agents/skills`
-- `oh-my-skill-hub add <name>`: scaffold a canonical skill
-- `oh-my-skill-hub scan`: inspect existing skill trees without writing
-- `oh-my-skill-hub status`: report canonical, consumer, target, and drift state
-- `oh-my-skill-hub sync`: project canonical skills into configured targets
-- `oh-my-skill-hub import`: normalize existing scattered skills into canonical
-- `oh-my-skill-hub pull <name>`: copy one skill from a Git-backed library into canonical
-- `oh-my-skill-hub push <name>`: commit one canonical skill back to the Git-backed library
+- `myskillhub init`: create `.agentisync.yaml` and `.agents/skills`
+- `myskillhub add <name>`: scaffold a canonical skill
+- `myskillhub scan`: inspect existing skill trees without writing
+- `myskillhub status`: report canonical, consumer, target, and drift state
+- `myskillhub sync`: project canonical skills into configured targets
+- `myskillhub import`: normalize existing scattered skills into canonical
+- `myskillhub pull <name>`: copy one skill from a Git-backed library into canonical
+- `myskillhub push <name>`: commit one canonical skill back to the Git-backed library
 
 Common options:
 
-- `oh-my-skill-hub status --json`
-- `oh-my-skill-hub scan --json`
-- `oh-my-skill-hub sync --dry-run`
-- `oh-my-skill-hub sync --force`
-- `oh-my-skill-hub import --json`
+- `myskillhub status --json`
+- `myskillhub scan --json`
+- `myskillhub sync --dry-run`
+- `myskillhub sync --force`
+- `myskillhub import --json`
 
 ### Command Examples
 
 Create a new project-local skill:
 
 ```bash
-oh-my-skill-hub add review-pr
+myskillhub add review-pr
 ```
 
 Preview and apply projections:
 
 ```bash
-oh-my-skill-hub status
-oh-my-skill-hub sync --dry-run
-oh-my-skill-hub sync
+myskillhub status
+myskillhub sync --dry-run
+myskillhub sync
 ```
 
 Use status in automation:
 
 ```bash
-oh-my-skill-hub status --json
+myskillhub status --json
 ```
 
 Important safety behavior:
@@ -247,7 +247,7 @@ Important safety behavior:
 Example:
 
 ```bash
-oh-my-skill-hub status --json
+myskillhub status --json
 ```
 
 In CI, any non-zero exit code should usually fail the job.
@@ -358,14 +358,14 @@ npm link
 然後執行：
 
 ```bash
-oh-my-skill-hub status
+myskillhub status
 ```
 
 檢查 CLI metadata：
 
 ```bash
-oh-my-skill-hub --help
-oh-my-skill-hub --version
+myskillhub --help
+myskillhub --version
 ```
 
 ## 快速開始
@@ -373,12 +373,12 @@ oh-my-skill-hub --version
 在想要共用 agent skills 的專案內執行：
 
 ```bash
-oh-my-skill-hub init
-oh-my-skill-hub add build-docs
-oh-my-skill-hub status
-oh-my-skill-hub sync --dry-run
-oh-my-skill-hub sync
-oh-my-skill-hub status
+myskillhub init
+myskillhub add build-docs
+myskillhub status
+myskillhub sync --dry-run
+myskillhub sync
+myskillhub status
 ```
 
 這會建立 `.agentisync.yaml`、建立 `.agents/skills`、建立 `.agents/skills/build-docs/SKILL.md`、回報 drift，並將 canonical skills 投影到設定好的 targets。
@@ -388,10 +388,10 @@ oh-my-skill-hub status
 如果 repo 已經有 `.claude/skills`、`.github/skills`、`.opencode/skills` 或全域 skill paths：
 
 ```bash
-oh-my-skill-hub init
-oh-my-skill-hub scan
-oh-my-skill-hub import
-oh-my-skill-hub status
+myskillhub init
+myskillhub scan
+myskillhub import
+myskillhub status
 ```
 
 `scan` 是唯讀，只分析既有 skills 並回報 duplicates 或 conflicts。
@@ -470,55 +470,55 @@ Global skills 不會靜默覆蓋 project canonical skills。如果同名 skill �
 
 初版 v1 命令：
 
-- `oh-my-skill-hub init`：建立 `.agentisync.yaml` 和 `.agents/skills`
-- `oh-my-skill-hub add <name>`：建立 canonical skill
-- `oh-my-skill-hub scan`：分析既有 skill trees，不寫入
-- `oh-my-skill-hub status`：回報 canonical、consumer、target 和 drift 狀態
-- `oh-my-skill-hub sync`：把 canonical skills 投影到 targets
-- `oh-my-skill-hub import`：把散落的 skills 收斂到 canonical
+- `myskillhub init`：建立 `.agentisync.yaml` 和 `.agents/skills`
+- `myskillhub add <name>`：建立 canonical skill
+- `myskillhub scan`：分析既有 skill trees，不寫入
+- `myskillhub status`：回報 canonical、consumer、target 和 drift 狀態
+- `myskillhub sync`：把 canonical skills 投影到 targets
+- `myskillhub import`：把散落的 skills 收斂到 canonical
 
 常用選項：
 
-- `oh-my-skill-hub status --json`
-- `oh-my-skill-hub scan --json`
-- `oh-my-skill-hub sync --dry-run`
-- `oh-my-skill-hub sync --force`
-- `oh-my-skill-hub import --json`
+- `myskillhub status --json`
+- `myskillhub scan --json`
+- `myskillhub sync --dry-run`
+- `myskillhub sync --force`
+- `myskillhub import --json`
 
 ### Command Examples
 
 建立新的 project-local skill：
 
 ```bash
-oh-my-skill-hub init
-oh-my-skill-hub add review-pr
+myskillhub init
+myskillhub add review-pr
 ```
 
 預覽並套用 projections：
 
 ```bash
-oh-my-skill-hub status
-oh-my-skill-hub sync --dry-run
-oh-my-skill-hub sync
+myskillhub status
+myskillhub sync --dry-run
+myskillhub sync
 ```
 
 寫入前先檢查 migration candidates：
 
 ```bash
-oh-my-skill-hub scan
-oh-my-skill-hub scan --json
+myskillhub scan
+myskillhub scan --json
 ```
 
 把既有 skills 匯入 canonical：
 
 ```bash
-oh-my-skill-hub import
+myskillhub import
 ```
 
 在 automation 中使用 status：
 
 ```bash
-oh-my-skill-hub status --json
+myskillhub status --json
 ```
 
 安全行為：
@@ -542,7 +542,7 @@ oh-my-skill-hub status --json
 範例：
 
 ```bash
-oh-my-skill-hub status --json
+myskillhub status --json
 ```
 
 在 CI 中，通常任何非 0 exit code 都應該讓 job 失敗。
