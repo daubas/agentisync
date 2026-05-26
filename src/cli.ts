@@ -15,22 +15,22 @@ import { getStatus } from "./status.js";
 const require = createRequire(import.meta.url);
 const packageJson = require("../package.json") as { version: string };
 
-const HELP = `Usage: oh-my-skill-hub <command> [options]
+const HELP = `Usage: myskillhub <command> [options]
 
 Commands:
-  oh-my-skill-hub init [--force] [--library <url>] [--branch <name>]
+  myskillhub init [--force] [--library <url>] [--branch <name>]
                                    Create .agentisync.yaml and .agents/skills
-  oh-my-skill-hub add <name>      Scaffold a canonical skill
-  oh-my-skill-hub status [--json] Report canonical, target, and drift state
-  oh-my-skill-hub sync --dry-run  Preview projection changes
-  oh-my-skill-hub sync            Project canonical skills into targets
-  oh-my-skill-hub sync --force    Replace conflicting target entries
-  oh-my-skill-hub pull <name>     Pull one skill from a configured library
-  oh-my-skill-hub push <name>     Publish one skill to the configured library
+  myskillhub add <name>           Scaffold a canonical skill
+  myskillhub status [--json]      Report canonical, target, and drift state
+  myskillhub sync --dry-run       Preview projection changes
+  myskillhub sync                 Project canonical skills into targets
+  myskillhub sync --force         Replace conflicting target entries
+  myskillhub pull <name>          Pull one skill from a configured library
+  myskillhub push <name>          Publish one skill to the configured library
 
 Advanced:
-  oh-my-skill-hub scan [--json]   Analyze existing skills without writing
-  oh-my-skill-hub import [--json] Import scattered skills into canonical
+  myskillhub scan [--json]        Analyze existing skills without writing
+  myskillhub import [--json]      Import scattered skills into canonical
 
 Options:
   --help, -h                      Show this help
@@ -59,14 +59,14 @@ async function main(): Promise<number> {
       force: initArgs.includes("--force"),
       library: parseInitLibrary(initArgs)
     });
-    console.log("initialized oh-my-skill-hub");
+    console.log("initialized myskillhub");
     return 0;
   }
 
   if (command === "add") {
     const name = process.argv[3];
     if (!name) {
-      throw new AgentisyncError("usage: oh-my-skill-hub add <name>", 2);
+      throw new AgentisyncError("usage: myskillhub add <name>", 2);
     }
     const config = await loadConfig(rootDir);
     await addSkill({ rootDir, homeDir, config, name });
@@ -122,7 +122,7 @@ async function main(): Promise<number> {
   if (command === "pull") {
     const name = process.argv[3];
     if (!name) {
-      throw new AgentisyncError("usage: oh-my-skill-hub pull <name>", 2);
+      throw new AgentisyncError("usage: myskillhub pull <name>", 2);
     }
     const config = await loadConfig(rootDir);
     await pullSkillFromLibrary({
@@ -139,7 +139,7 @@ async function main(): Promise<number> {
   if (command === "push") {
     const name = process.argv[3];
     if (!name) {
-      throw new AgentisyncError("usage: oh-my-skill-hub push <name>", 2);
+      throw new AgentisyncError("usage: myskillhub push <name>", 2);
     }
     const config = await loadConfig(rootDir);
     await pushSkillToLibrary({
@@ -182,7 +182,7 @@ async function main(): Promise<number> {
   }
 
   console.error(`Unsupported command: ${command}`);
-  console.error("Run `oh-my-skill-hub --help` for usage.");
+  console.error("Run `myskillhub --help` for usage.");
   return 2;
 }
 

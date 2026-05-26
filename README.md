@@ -6,6 +6,8 @@
 
 It gives you one canonical skill tree, optional sync targets for agent CLIs, and an optional Git-backed library for pulling or publishing single skills.
 
+The primary CLI command is `myskillhub`. `oh-my-skill-hub` remains available as a compatibility alias.
+
 Status: v0.1.0 source release. Core v1 commands are implemented with TDD coverage.
 
 ## Project Status

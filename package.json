@@ -4,6 +4,7 @@
   "description": "`oh-my-skill-hub` is a local control plane for agent skills in a repository.",
   "type": "module",
   "bin": {
+    "myskillhub": "./dist/cli.js",
     "oh-my-skill-hub": "./dist/cli.js"
   },
   "files": [

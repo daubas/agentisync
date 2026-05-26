@@ -58,9 +58,9 @@ describe("cli", () => {
 
     const result = await runCli(["--help"], root);
 
-    expect(result.stdout).toContain("Usage: oh-my-skill-hub <command>");
-    expect(result.stdout).toContain("oh-my-skill-hub init");
-    expect(result.stdout).toContain("oh-my-skill-hub sync --dry-run");
+    expect(result.stdout).toContain("Usage: myskillhub <command>");
+    expect(result.stdout).toContain("myskillhub init");
+    expect(result.stdout).toContain("myskillhub sync --dry-run");
   });
 
   it("prints version without requiring a project config", async () => {
