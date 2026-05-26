@@ -34,15 +34,15 @@ async function runGit(args: string[], cwd: string): Promise<void> {
 }
 
 async function seedLibraryRepo(content: string): Promise<string> {
-  const library = await mkdtemp(path.join(tmpdir(), "agentisync-library-"));
-  const workParent = await mkdtemp(path.join(tmpdir(), "agentisync-seed-"));
+  const library = await mkdtemp(path.join(tmpdir(), "oh-my-skill-hub-library-"));
+  const workParent = await mkdtemp(path.join(tmpdir(), "oh-my-skill-hub-seed-"));
   const work = path.join(workParent, "repo");
 
   await runGit(["init", "--bare", library], workParent);
   await runGit(["clone", library, work], workParent);
   await runGit(["checkout", "-b", "main"], work);
-  await runGit(["config", "user.name", "agentisync"], work);
-  await runGit(["config", "user.email", "agentisync@local"], work);
+  await runGit(["config", "user.name", "oh-my-skill-hub"], work);
+  await runGit(["config", "user.email", "oh-my-skill-hub@local"], work);
   await mkdir(path.join(work, ".agents/skills/build-docs"), { recursive: true });
   await writeFile(path.join(work, ".agents/skills/build-docs/SKILL.md"), content);
   await runGit(["add", "."], work);
@@ -54,17 +54,17 @@ async function seedLibraryRepo(content: string): Promise<string> {
 
 describe("cli", () => {
   it("prints help without requiring a project config", async () => {
-    const root = await mkdtemp(path.join(tmpdir(), "agentisync-cli-"));
+    const root = await mkdtemp(path.join(tmpdir(), "oh-my-skill-hub-cli-"));
 
     const result = await runCli(["--help"], root);
 
-    expect(result.stdout).toContain("Usage: agentisync <command>");
-    expect(result.stdout).toContain("agentisync init");
-    expect(result.stdout).toContain("agentisync sync --dry-run");
+    expect(result.stdout).toContain("Usage: oh-my-skill-hub <command>");
+    expect(result.stdout).toContain("oh-my-skill-hub init");
+    expect(result.stdout).toContain("oh-my-skill-hub sync --dry-run");
   });
 
   it("prints version without requiring a project config", async () => {
-    const root = await mkdtemp(path.join(tmpdir(), "agentisync-cli-"));
+    const root = await mkdtemp(path.join(tmpdir(), "oh-my-skill-hub-cli-"));
 
     const result = await runCli(["--version"], root);
 
@@ -72,7 +72,7 @@ describe("cli", () => {
   });
 
   it("runs init, add, status, and sync dry-run", async () => {
-    const root = await mkdtemp(path.join(tmpdir(), "agentisync-cli-"));
+    const root = await mkdtemp(path.join(tmpdir(), "oh-my-skill-hub-cli-"));
 
     await runCli(["init"], root);
     await runCli(["add", "build-docs"], root);
@@ -87,7 +87,7 @@ describe("cli", () => {
   });
 
   it("initializes a library-backed config from the cli", async () => {
-    const root = await mkdtemp(path.join(tmpdir(), "agentisync-cli-"));
+    const root = await mkdtemp(path.join(tmpdir(), "oh-my-skill-hub-cli-"));
 
     await runCli(["init", "--library", "git@github-daubas:daubas/skills.git", "--branch", "main"], root);
 
@@ -97,7 +97,7 @@ describe("cli", () => {
   });
 
   it("imports existing skills", async () => {
-    const root = await mkdtemp(path.join(tmpdir(), "agentisync-cli-"));
+    const root = await mkdtemp(path.join(tmpdir(), "oh-my-skill-hub-cli-"));
     await mkdir(path.join(root, ".claude/skills/build-docs"), { recursive: true });
     await writeFile(path.join(root, ".claude/skills/build-docs/SKILL.md"), "from claude\n");
 
@@ -109,7 +109,7 @@ describe("cli", () => {
   });
 
   it("returns exit code 3 for unsafe import conflicts", async () => {
-    const root = await mkdtemp(path.join(tmpdir(), "agentisync-cli-"));
+    const root = await mkdtemp(path.join(tmpdir(), "oh-my-skill-hub-cli-"));
     await mkdir(path.join(root, ".claude/skills/build-docs"), { recursive: true });
     await mkdir(path.join(root, ".opencode/skills/build-docs"), { recursive: true });
     await writeFile(path.join(root, ".claude/skills/build-docs/SKILL.md"), "from claude\n");
@@ -123,7 +123,7 @@ describe("cli", () => {
   });
 
   it("pulls a single skill from a git library", async () => {
-    const root = await mkdtemp(path.join(tmpdir(), "agentisync-cli-"));
+    const root = await mkdtemp(path.join(tmpdir(), "oh-my-skill-hub-cli-"));
     const library = await seedLibraryRepo("from library\n");
 
     await runCli(["init"], root);
@@ -145,7 +145,7 @@ describe("cli", () => {
   });
 
   it("pushes a single skill back to the git library", async () => {
-    const root = await mkdtemp(path.join(tmpdir(), "agentisync-cli-"));
+    const root = await mkdtemp(path.join(tmpdir(), "oh-my-skill-hub-cli-"));
     const library = await seedLibraryRepo("from library\n");
 
     await runCli(["init"], root);

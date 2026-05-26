@@ -77,8 +77,8 @@ export async function pushSkillToLibrary(options: PushSkillOptions): Promise<voi
       return;
     }
 
-    await git(["config", "user.name", "agentisync"], libraryClone);
-    await git(["config", "user.email", "agentisync@local"], libraryClone);
+    await git(["config", "user.name", "oh-my-skill-hub"], libraryClone);
+    await git(["config", "user.email", "oh-my-skill-hub@local"], libraryClone);
     await git(["add", relPath], libraryClone);
     await git(["commit", "-m", `Update ${options.name}`], libraryClone);
     await git(["push", "origin", `HEAD${library.branch ? `:${library.branch}` : ""}`], libraryClone);
@@ -88,7 +88,7 @@ export async function pushSkillToLibrary(options: PushSkillOptions): Promise<voi
 }
 
 async function cloneLibraryRepo(url: string, branch?: string): Promise<string> {
-  const cloneDir = await mkdtemp(path.join(tmpdir(), "agentisync-library-"));
+  const cloneDir = await mkdtemp(path.join(tmpdir(), "oh-my-skill-hub-library-"));
   const args = ["clone"];
   if (branch) {
     args.push("--branch", branch, "--single-branch");

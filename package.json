@@ -1,10 +1,10 @@
 {
-  "name": "agentisync",
+  "name": "oh-my-skill-hub",
   "version": "0.1.0",
-  "description": "`agentisync` is a local control plane for agent skills in a repository.",
+  "description": "`oh-my-skill-hub` is a local control plane for agent skills in a repository.",
   "type": "module",
   "bin": {
-    "agentisync": "./dist/cli.js"
+    "oh-my-skill-hub": "./dist/cli.js"
   },
   "files": [
     "dist",
@@ -24,7 +24,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/daubas/agentisync.git"
+    "url": "git+https://github.com/daubas/oh-my-skill-hub.git"
   },
   "keywords": [
     "agent-skills",
@@ -39,9 +39,9 @@
   "author": "daubas",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/daubas/agentisync/issues"
+    "url": "https://github.com/daubas/oh-my-skill-hub/issues"
   },
-  "homepage": "https://github.com/daubas/agentisync#readme",
+  "homepage": "https://github.com/daubas/oh-my-skill-hub#readme",
   "devDependencies": {
     "@types/node": "^25.7.0",
     "tsx": "^4.21.0",

@@ -1,8 +1,8 @@
-# agentisync
+# oh-my-skill-hub
 
-[![CI](https://github.com/daubas/agentisync/actions/workflows/ci.yml/badge.svg)](https://github.com/daubas/agentisync/actions/workflows/ci.yml)
+[![CI](https://github.com/daubas/oh-my-skill-hub/actions/workflows/ci.yml/badge.svg)](https://github.com/daubas/oh-my-skill-hub/actions/workflows/ci.yml)
 
-`agentisync` is a local control plane for agent skills in a repository.
+`oh-my-skill-hub` is a local control plane for agent skills in a repository.
 
 It gives you one canonical skill tree, optional sync targets for agent CLIs, and an optional Git-backed library for pulling or publishing single skills.
 
@@ -11,7 +11,7 @@ Status: v0.1.0 source release. Core v1 commands are implemented with TDD coverag
 ## Project Status
 
 - Current release: `v0.1.0`
-- GitHub Release: <https://github.com/daubas/agentisync/releases/tag/v0.1.0>
+- GitHub Release: <https://github.com/daubas/oh-my-skill-hub/releases/tag/v0.1.0>
 - npm package: not published yet
 - Local release gate: `npm run release:check`
 - Clean Linux release gate: Docker command in [Release Checks](#release-checks)
@@ -33,8 +33,8 @@ The package is not published to npm yet.
 For local development:
 
 ```bash
-git clone https://github.com/daubas/agentisync.git
-cd agentisync
+git clone https://github.com/daubas/oh-my-skill-hub.git
+cd oh-my-skill-hub
 npm install
 npm run build
 npm link
@@ -43,14 +43,14 @@ npm link
 Then run:
 
 ```bash
-agentisync status
+oh-my-skill-hub status
 ```
 
 Check CLI metadata:
 
 ```bash
-agentisync --help
-agentisync --version
+oh-my-skill-hub --help
+oh-my-skill-hub --version
 ```
 
 ## Quickstart
@@ -58,12 +58,12 @@ agentisync --version
 Inside the project that should own shared agent skills:
 
 ```bash
-agentisync init --library git@github-daubas:daubas/skills.git --branch main
-agentisync pull build-docs
-agentisync add review-pr
-agentisync status
-agentisync sync --dry-run
-agentisync sync
+oh-my-skill-hub init --library git@github-daubas:daubas/skills.git --branch main
+oh-my-skill-hub pull build-docs
+oh-my-skill-hub add review-pr
+oh-my-skill-hub status
+oh-my-skill-hub sync --dry-run
+oh-my-skill-hub sync
 ```
 
 That creates `.agentisync.yaml`, creates `.agents/skills`, connects the optional skills library, and keeps local targets in sync.
@@ -73,19 +73,19 @@ That creates `.agentisync.yaml`, creates `.agents/skills`, connects the optional
 Use `pull` and `push` to move one skill at a time between the local canonical tree and the central Git repo:
 
 ```bash
-agentisync pull build-docs
-agentisync push build-docs
+oh-my-skill-hub pull build-docs
+oh-my-skill-hub push build-docs
 ```
 
-If you do not want a library yet, run `agentisync init` without `--library`.
+If you do not want a library yet, run `oh-my-skill-hub init` without `--library`.
 
 ## Advanced Migration
 
 If a repo already has skills in `.claude/skills`, `.github/skills`, `.opencode/skills`, or global skill paths, use:
 
 ```bash
-agentisync scan
-agentisync import
+oh-my-skill-hub scan
+oh-my-skill-hub import
 ```
 
 `scan` is read-only. `import` writes into `.agents/skills` and stops if there are unresolved conflicts.
@@ -106,7 +106,7 @@ Without a repo-level control plane, users end up copying skills manually, creati
 
 ## Product Contract
 
-`agentisync` owns three jobs:
+`oh-my-skill-hub` owns three jobs:
 
 - describe the canonical skill state of the repo
 - detect drift across agent CLI skill locations
@@ -171,7 +171,7 @@ Config notes:
 
 ### Project vs Global Skills
 
-`agentisync` uses project-first precedence:
+`oh-my-skill-hub` uses project-first precedence:
 
 1. `.agents/skills` is the project canonical source of truth.
 2. Project tool paths such as `.claude/skills` or `.opencode/skills` are migration sources or projection targets.
@@ -179,49 +179,49 @@ Config notes:
 
 Global skills do not silently override project canonical skills. If the same skill name exists in project and global locations with different content, `scan` and `import` report a conflict instead of choosing one.
 
-Different agent CLIs may apply their own runtime precedence. `agentisync` uses project-first precedence for repo state because project skills are Git-friendly and reproducible.
+Different agent CLIs may apply their own runtime precedence. `oh-my-skill-hub` uses project-first precedence for repo state because project skills are Git-friendly and reproducible.
 
 ## Commands
 
 Initial v1 commands:
 
-- `agentisync init`: create `.agentisync.yaml` and `.agents/skills`
-- `agentisync add <name>`: scaffold a canonical skill
-- `agentisync scan`: inspect existing skill trees without writing
-- `agentisync status`: report canonical, consumer, target, and drift state
-- `agentisync sync`: project canonical skills into configured targets
-- `agentisync import`: normalize existing scattered skills into canonical
-- `agentisync pull <name>`: copy one skill from a Git-backed library into canonical
-- `agentisync push <name>`: commit one canonical skill back to the Git-backed library
+- `oh-my-skill-hub init`: create `.agentisync.yaml` and `.agents/skills`
+- `oh-my-skill-hub add <name>`: scaffold a canonical skill
+- `oh-my-skill-hub scan`: inspect existing skill trees without writing
+- `oh-my-skill-hub status`: report canonical, consumer, target, and drift state
+- `oh-my-skill-hub sync`: project canonical skills into configured targets
+- `oh-my-skill-hub import`: normalize existing scattered skills into canonical
+- `oh-my-skill-hub pull <name>`: copy one skill from a Git-backed library into canonical
+- `oh-my-skill-hub push <name>`: commit one canonical skill back to the Git-backed library
 
 Common options:
 
-- `agentisync status --json`
-- `agentisync scan --json`
-- `agentisync sync --dry-run`
-- `agentisync sync --force`
-- `agentisync import --json`
+- `oh-my-skill-hub status --json`
+- `oh-my-skill-hub scan --json`
+- `oh-my-skill-hub sync --dry-run`
+- `oh-my-skill-hub sync --force`
+- `oh-my-skill-hub import --json`
 
 ### Command Examples
 
 Create a new project-local skill:
 
 ```bash
-agentisync add review-pr
+oh-my-skill-hub add review-pr
 ```
 
 Preview and apply projections:
 
 ```bash
-agentisync status
-agentisync sync --dry-run
-agentisync sync
+oh-my-skill-hub status
+oh-my-skill-hub sync --dry-run
+oh-my-skill-hub sync
 ```
 
 Use status in automation:
 
 ```bash
-agentisync status --json
+oh-my-skill-hub status --json
 ```
 
 Important safety behavior:
@@ -245,7 +245,7 @@ Important safety behavior:
 Example:
 
 ```bash
-agentisync status --json
+oh-my-skill-hub status --json
 ```
 
 In CI, any non-zero exit code should usually fail the job.
@@ -311,11 +311,11 @@ Out of scope:
 
 ---
 
-# agentisync 繁體中文說明
+# oh-my-skill-hub 繁體中文說明
 
-[![CI](https://github.com/daubas/agentisync/actions/workflows/ci.yml/badge.svg)](https://github.com/daubas/agentisync/actions/workflows/ci.yml)
+[![CI](https://github.com/daubas/oh-my-skill-hub/actions/workflows/ci.yml/badge.svg)](https://github.com/daubas/oh-my-skill-hub/actions/workflows/ci.yml)
 
-`agentisync` 是 repo 內 agent skills 的本地控制層。
+`oh-my-skill-hub` 是 repo 內 agent skills 的本地控制層。
 
 它面向會在同一個專案中切換多個 agent CLI 的 power user，幫助使用者維護一份 canonical skill tree、檢查 drift，並把 skills 投影到各工具需要的路徑。
 
@@ -324,7 +324,7 @@ Out of scope:
 ## Project Status
 
 - 目前 release：`v0.1.0`
-- GitHub Release：<https://github.com/daubas/agentisync/releases/tag/v0.1.0>
+- GitHub Release：<https://github.com/daubas/oh-my-skill-hub/releases/tag/v0.1.0>
 - npm package：尚未發布
 - 本機 release gate：`npm run release:check`
 - 乾淨 Linux release gate：見 [Release Checks](#release-checks)
@@ -346,8 +346,8 @@ Out of scope:
 本機開發使用：
 
 ```bash
-git clone https://github.com/daubas/agentisync.git
-cd agentisync
+git clone https://github.com/daubas/oh-my-skill-hub.git
+cd oh-my-skill-hub
 npm install
 npm run build
 npm link
@@ -356,14 +356,14 @@ npm link
 然後執行：
 
 ```bash
-agentisync status
+oh-my-skill-hub status
 ```
 
 檢查 CLI metadata：
 
 ```bash
-agentisync --help
-agentisync --version
+oh-my-skill-hub --help
+oh-my-skill-hub --version
 ```
 
 ## 快速開始
@@ -371,12 +371,12 @@ agentisync --version
 在想要共用 agent skills 的專案內執行：
 
 ```bash
-agentisync init
-agentisync add build-docs
-agentisync status
-agentisync sync --dry-run
-agentisync sync
-agentisync status
+oh-my-skill-hub init
+oh-my-skill-hub add build-docs
+oh-my-skill-hub status
+oh-my-skill-hub sync --dry-run
+oh-my-skill-hub sync
+oh-my-skill-hub status
 ```
 
 這會建立 `.agentisync.yaml`、建立 `.agents/skills`、建立 `.agents/skills/build-docs/SKILL.md`、回報 drift，並將 canonical skills 投影到設定好的 targets。
@@ -386,10 +386,10 @@ agentisync status
 如果 repo 已經有 `.claude/skills`、`.github/skills`、`.opencode/skills` 或全域 skill paths：
 
 ```bash
-agentisync init
-agentisync scan
-agentisync import
-agentisync status
+oh-my-skill-hub init
+oh-my-skill-hub scan
+oh-my-skill-hub import
+oh-my-skill-hub status
 ```
 
 `scan` 是唯讀，只分析既有 skills 並回報 duplicates 或 conflicts。
@@ -412,7 +412,7 @@ Agent skills 雖然共用 `SKILL.md` 格式，但不同 agent CLI 仍然從不�
 
 ## 產品契約
 
-`agentisync` 只負責三件事：
+`oh-my-skill-hub` 只負責三件事：
 
 - 描述目前 repo 的 canonical skill state
 - 偵測不同 agent CLI skill 路徑之間的 drift
@@ -454,7 +454,7 @@ Agent skills 雖然共用 `SKILL.md` 格式，但不同 agent CLI 仍然從不�
 
 ### Project vs Global Skills
 
-`agentisync` 採用 project-first precedence：
+`oh-my-skill-hub` 採用 project-first precedence：
 
 1. `.agents/skills` 是 project canonical source of truth。
 2. `.claude/skills` 或 `.opencode/skills` 這類 project tool paths 是 migration sources 或 projection targets。
@@ -462,61 +462,61 @@ Agent skills 雖然共用 `SKILL.md` 格式，但不同 agent CLI 仍然從不�
 
 Global skills 不會靜默覆蓋 project canonical skills。如果同名 skill 同時存在 project 和 global locations，且內容不同，`scan` 和 `import` 會回報 conflict，而不是自動選一個。
 
-不同 agent CLI 可能有自己的 runtime precedence。`agentisync` 對 repo state 採 project-first precedence，因為 project skills 比較 Git-friendly，也比較可重現。
+不同 agent CLI 可能有自己的 runtime precedence。`oh-my-skill-hub` 對 repo state 採 project-first precedence，因為 project skills 比較 Git-friendly，也比較可重現。
 
 ## 命令
 
 初版 v1 命令：
 
-- `agentisync init`：建立 `.agentisync.yaml` 和 `.agents/skills`
-- `agentisync add <name>`：建立 canonical skill
-- `agentisync scan`：分析既有 skill trees，不寫入
-- `agentisync status`：回報 canonical、consumer、target 和 drift 狀態
-- `agentisync sync`：把 canonical skills 投影到 targets
-- `agentisync import`：把散落的 skills 收斂到 canonical
+- `oh-my-skill-hub init`：建立 `.agentisync.yaml` 和 `.agents/skills`
+- `oh-my-skill-hub add <name>`：建立 canonical skill
+- `oh-my-skill-hub scan`：分析既有 skill trees，不寫入
+- `oh-my-skill-hub status`：回報 canonical、consumer、target 和 drift 狀態
+- `oh-my-skill-hub sync`：把 canonical skills 投影到 targets
+- `oh-my-skill-hub import`：把散落的 skills 收斂到 canonical
 
 常用選項：
 
-- `agentisync status --json`
-- `agentisync scan --json`
-- `agentisync sync --dry-run`
-- `agentisync sync --force`
-- `agentisync import --json`
+- `oh-my-skill-hub status --json`
+- `oh-my-skill-hub scan --json`
+- `oh-my-skill-hub sync --dry-run`
+- `oh-my-skill-hub sync --force`
+- `oh-my-skill-hub import --json`
 
 ### Command Examples
 
 建立新的 project-local skill：
 
 ```bash
-agentisync init
-agentisync add review-pr
+oh-my-skill-hub init
+oh-my-skill-hub add review-pr
 ```
 
 預覽並套用 projections：
 
 ```bash
-agentisync status
-agentisync sync --dry-run
-agentisync sync
+oh-my-skill-hub status
+oh-my-skill-hub sync --dry-run
+oh-my-skill-hub sync
 ```
 
 寫入前先檢查 migration candidates：
 
 ```bash
-agentisync scan
-agentisync scan --json
+oh-my-skill-hub scan
+oh-my-skill-hub scan --json
 ```
 
 把既有 skills 匯入 canonical：
 
 ```bash
-agentisync import
+oh-my-skill-hub import
 ```
 
 在 automation 中使用 status：
 
 ```bash
-agentisync status --json
+oh-my-skill-hub status --json
 ```
 
 安全行為：
@@ -540,7 +540,7 @@ agentisync status --json
 範例：
 
 ```bash
-agentisync status --json
+oh-my-skill-hub status --json
 ```
 
 在 CI 中，通常任何非 0 exit code 都應該讓 job 失敗。
